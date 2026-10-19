@@ -8,3 +8,10 @@
 /* Transparent red and cherry-gold brand mark. */
 .header{height:84px}.brand{background:transparent;width:150px;height:70px;display:flex;align-items:center;overflow:visible;flex-shrink:0}.brand img{width:150px;height:auto;object-fit:contain;transform:none}@media(max-width:760px){.header{height:72px}.brand{width:120px;height:58px}.brand img{width:120px;height:auto;transform:none}}
 
+
+/* Header navigation, matching footer branding and compact social cards. */
+.header nav{font-size:15px;font-weight:500;gap:30px}.header nav a{padding:12px 0}.mobile-nav a{font-size:16px}.header-chat{font-size:14px}
+.footer-brand{display:flex;align-items:center;justify-content:center;align-self:start;width:182px;min-height:100px;padding:12px 16px;background:var(--ivory);border-radius:3px;line-height:1;letter-spacing:normal}.footer-brand img{display:block;width:150px;height:auto}.footer-top>.footer-brand:hover{opacity:1}
+.social-section{padding-top:48px;padding-bottom:42px}.social-section .section-heading{margin-bottom:24px}.social-grid>a{padding:17px 22px;gap:17px}.social-icon{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center}.social-icon svg{display:block;width:28px;height:28px}.instagram-icon{color:#c13584}.social-grid h3{font-size:22px;margin:4px 0}.social-section .contact-line{margin-top:24px;padding-top:20px}
+@media(min-width:761px) and (max-width:1000px){.header{gap:18px}.header nav{gap:17px;font-size:14px}.header-chat{font-size:12px;padding:11px 13px}.header-chat span{padding-left:10px}}
+@media(max-width:760px){.header-chat{font-size:12px}.social-section{padding-top:36px;padding-bottom:32px}.social-grid>a{padding:14px 18px}.social-grid{gap:10px}.social-grid h3{font-size:21px}.footer-brand{width:150px;min-height:82px;padding:10px}.footer-brand img{width:130px}}
