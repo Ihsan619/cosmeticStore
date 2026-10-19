@@ -15,3 +15,6 @@
 .social-section{padding-top:48px;padding-bottom:42px}.social-section .section-heading{margin-bottom:24px}.social-grid>a{padding:17px 22px;gap:17px}.social-icon{width:30px;height:30px;flex:0 0 30px;display:flex;align-items:center;justify-content:center}.social-icon svg{display:block;width:28px;height:28px}.instagram-icon{color:#c13584}.social-grid h3{font-size:22px;margin:4px 0}.social-section .contact-line{margin-top:24px;padding-top:20px}
 @media(min-width:761px) and (max-width:1000px){.header{gap:18px}.header nav{gap:17px;font-size:14px}.header-chat{font-size:12px;padding:11px 13px}.header-chat span{padding-left:10px}}
 @media(max-width:760px){.header-chat{font-size:12px}.social-section{padding-top:36px;padding-bottom:32px}.social-grid>a{padding:14px 18px}.social-grid{gap:10px}.social-grid h3{font-size:21px}.footer-brand{width:150px;min-height:82px;padding:10px}.footer-brand img{width:130px}}
+
+/* WhatsApp brand icon on both chat buttons. */
+.header-chat{display:inline-flex;align-items:center;gap:9px}.header-chat .whatsapp-icon{width:20px;height:20px;flex-shrink:0;color:#25a65a}.header-chat span{padding-left:8px}.floating-chat .whatsapp-icon{fill:currentColor;stroke:none;width:25px;height:25px}
