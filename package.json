@@ -1,0 +1,1 @@
+{"name":"choicez-lk","private":true,"version":"1.0.0","scripts":{"dev":"node serve.cjs","check":"node --check dist/app.js && node --check serve.cjs"}}
