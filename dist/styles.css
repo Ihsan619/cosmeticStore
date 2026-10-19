@@ -6,4 +6,5 @@
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
 
 /* Transparent red and cherry-gold brand mark. */
-.brand{background:transparent;width:170px;height:82px;display:flex;align-items:center;overflow:visible}.brand img{width:170px;height:auto;object-fit:contain;transform:none}@media(max-width:760px){.brand{width:135px;height:65px}.brand img{width:135px;height:auto;transform:none}}
+.header{height:84px}.brand{background:transparent;width:150px;height:70px;display:flex;align-items:center;overflow:visible;flex-shrink:0}.brand img{width:150px;height:auto;object-fit:contain;transform:none}@media(max-width:760px){.header{height:72px}.brand{width:120px;height:58px}.brand img{width:120px;height:auto;transform:none}}
+
