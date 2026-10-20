@@ -1,19 +1,84 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Choicez.lk — Local product editor</title><style>*{box-sizing:border-box}body{font:14px/1.6 Arial,sans-serif;margin:0;background:#fffaf5;color:#302923}main{max-width:1100px;margin:auto;padding:35px 25px}h1{font-family:Georgia,serif;font-size:36px;font-weight:400;color:#cb091b}.notice{padding:20px;background:#f1e4dc;border-left:3px solid #cb091b}.layout{display:grid;grid-template-columns:1fr 1fr;gap:35px;margin-top:30px}label{display:block;margin-bottom:15px}input,textarea,select{display:block;width:100%;padding:11px;border:1px solid #dacdc1;background:white;font:inherit;margin-top:5px}input[type=checkbox]{display:inline;width:auto}input[type=file]{font-size:12px}textarea{min-height:100px}button,.file-button{background:#cb091b;color:white;border:0;padding:12px 17px;font:inherit;cursor:pointer;display:inline-block;margin:5px 5px 5px 0}.secondary{background:#ebe0d6;color:#302923}.toolbar{display:flex;flex-wrap:wrap;align-items:center}.toolbar label{margin:0}.item{padding:15px;border:1px solid #dacdc1;margin:12px 0;display:flex;align-items:center;gap:15px}.item img{width:60px;height:60px;object-fit:cover}.item div{flex:1}.item p{margin:0;font-size:12px}.item button{font-size:12px;padding:7px 10px}.item .delete{background:#ebe0d6;color:#8b0d1c}#preview{max-height:160px;max-width:100%;margin:10px 0}#status{font-weight:bold;color:#285d45}small{color:#776f68}input:focus-visible,button:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #9c662b;outline-offset:3px}@media(max-width:700px){.layout{grid-template-columns:1fr}.item{flex-wrap:wrap}}</style></head><body><main><h1>Choicez.lk product editor</h1><p class="notice"><strong>This is a local preparation tool.</strong> Changes are saved in this browser only. Export the catalogue and replace <code>dist/products.json</code>, then redeploy the website to update the live collection. There is no shared online admin or automatic publishing.</p><div class="toolbar"><label class="file-button secondary">Import catalogue<input id="import" type="file" accept="application/json,.json" hidden></label><button id="export">Export products.json</button><button id="new" class="secondary">New product</button></div><p id="status" role="status" aria-live="polite"></p><div class="layout"><form id="form"><h2 id="form-title">Add a product</h2><label>Product name<input id="name" required maxlength="160"></label><label>Category<select id="category"><option value="cosmetics">Cosmetics</option><option value="skincare">Creams & skincare</option><option value="perfumes">Perfumes</option><option value="gifts">Gift hampers</option><option value="watches">Watches</option></select></label><label>Brand (optional)<input id="brand" maxlength="100"></label><label>Price in LKR (leave blank for enquiries)<input id="price" type="number" min="0" step="0.01"></label><label>Description<textarea id="description" maxlength="4000"></textarea></label><label>Sizes, shades or options<input id="variants" maxlength="500"></label><label>Availability<select id="availability"><option>Ask about availability</option><option>In stock</option><option>Out of stock</option><option>Available to order</option></select></label><label>Product photo (JPEG, PNG or WebP)<input id="photo" type="file" accept="image/jpeg,image/png,image/webp"></label><small>Photos are resized and included in the exported catalogue. For large collections, move images to hosted asset storage.</small><br><img id="preview" alt="Selected product photo" hidden><button type="button" id="remove-image" class="secondary" hidden>Remove photo</button><label>Or an image URL / site-relative asset path<input id="image-url" placeholder="https://… or assets/product.jpg"></label><label><input id="published" type="checkbox" checked> Show in the catalogue</label><button type="submit" id="save">Save product locally</button><button type="button" id="cancel" class="secondary">Clear form</button></form><section><h2>Your products <span id="count"></span></h2><p><small>Order here determines the storefront’s featured order. Draft products are excluded from the storefront.</small></p><div id="items"></div></section></div></main><script>
-'use strict';const $=s=>document.querySelector(s),key='choicez-catalogue-v1',cats=['cosmetics','skincare','perfumes','gifts','watches'];let products=[],editing=null,photo='',busy=false,storageAvailable=true;
-const safe=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function status(s){$('#status').textContent=s}function persist(){try{localStorage.setItem(key,JSON.stringify(products));storageAvailable=true;return true}catch{storageAvailable=false;status('Browser storage is unavailable or full. Export now to keep your changes.');return false}}
-try{const raw=localStorage.getItem(key);if(raw){const parsed=JSON.parse(raw);if(Array.isArray(parsed))products=parsed}}catch{status('Could not restore browser storage. Import your last exported catalogue.');storageAvailable=false}
-function validImage(s){return !s||/^https?:\/\//i.test(s)||/^assets\/[a-zA-Z0-9_./-]+$/.test(s)||/^data:image\/(jpeg|png|webp);base64,/.test(s)}
-function render(){$('#count').textContent=`(${products.length})`;$('#items').innerHTML=products.length?products.map((p,i)=>`<article class="item">${p.image&&validImage(p.image)?`<img src="${safe(p.image.startsWith('assets/')?'../dist/'+p.image:p.image)}" alt="">`:''}<div><strong>${safe(p.name)}</strong><p>${safe(p.category)} · ${p.price===null?'Price on enquiry':'LKR '+safe(p.price)} · ${p.published===false?'Draft':'Published'}</p></div><button data-edit="${i}">Edit</button><button class="secondary" data-up="${i}" ${i===0?'disabled':''} aria-label="Move ${safe(p.name)} up">↑</button><button class="delete" data-delete="${i}">Delete</button></article>`).join(''):'<p>No products yet. Add your first product or import an existing catalogue.</p>';document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>edit(+b.dataset.edit));document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{const i=+b.dataset.delete;if(confirm(`Delete ${products[i].name}?`)){products.splice(i,1);if(editing===i)reset();persist();render()}});document.querySelectorAll('[data-up]').forEach(b=>b.onclick=()=>{const i=+b.dataset.up;if(i>0){[products[i-1],products[i]]=[products[i],products[i-1]];persist();render()}})}
-function reset(){editing=null;photo='';$('#form').reset();$('#published').checked=true;$('#form-title').textContent='Add a product';$('#preview').hidden=true;$('#remove-image').hidden=true;$('#image-url').value=''}
-function edit(i){reset();const p=products[i];editing=p.id;['name','category','brand','description','variants','availability'].forEach(k=>$('#'+k).value=p[k]||'');$('#price').value=p.price??'';$('#published').checked=p.published!==false;photo=p.image||'';showPhoto();$('#form-title').textContent='Edit product';$('#name').focus()}
-function showPhoto(){$('#preview').hidden=!photo;$('#remove-image').hidden=!photo;if(photo)$('#preview').src=photo.startsWith('assets/')?'../dist/'+photo:photo;$('#image-url').value=photo.startsWith('data:')?'':photo}
-$('#remove-image').onclick=()=>{photo='';$('#photo').value='';showPhoto()};
-$('#photo').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>15*1024*1024){status('Choose a JPEG, PNG or WebP photo under 15 MB.');return}busy=true;$('#save').disabled=true;try{const bitmap=await createImageBitmap(file),scale=Math.min(1,1000/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.round(bitmap.width*scale);canvas.height=Math.round(bitmap.height*scale);const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,0,0,canvas.width,canvas.height);photo=canvas.toDataURL('image/jpeg',.82);bitmap.close();showPhoto();status('Photo ready. Save the product to keep it.')}catch{status('Could not read this photo. Try another image.')}finally{busy=false;$('#save').disabled=false}};
-$('#image-url').oninput=e=>{const v=e.target.value.trim();if(validImage(v)){photo=v;$('#preview').hidden=true;$('#remove-image').hidden=!v}};
-$('#form').onsubmit=e=>{e.preventDefault();if(busy)return;const name=$('#name').value.trim();if(!name){status('Enter a product name.');return}if(!validImage($('#image-url').value.trim())){status('Use an HTTPS image URL or an assets/ path.');return}const p={id:editing||'cz-'+crypto.randomUUID(),name,category:$('#category').value,brand:$('#brand').value.trim(),price:$('#price').value===''?null:Number($('#price').value),description:$('#description').value.trim(),variants:$('#variants').value.trim(),availability:$('#availability').value,image:photo,published:$('#published').checked};const i=products.findIndex(p=>p.id===editing);if(i>=0)products[i]=p;else products.push(p);const saved=persist();render();reset();if(saved)status('Saved in this browser. Export the catalogue when you’re ready to update the website.')};
-$('#new').onclick=()=>{reset();$('#name').focus()};$('#cancel').onclick=reset;
-$('#export').onclick=()=>{const blob=new Blob([JSON.stringify(products,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='products.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);status('Catalogue exported. Replace dist/products.json and redeploy to publish it.')};
-$('#import').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const data=JSON.parse(await f.text());if(!Array.isArray(data)||data.some(p=>!p||typeof p.name!=='string'||!p.name.trim()||typeof p.id!=='string'||!p.id||!cats.includes(p.category)||!(p.price==null||typeof p.price==='number'&&Number.isFinite(p.price)&&p.price>=0)||p.image&&(!validImage(p.image)||typeof p.image!=='string'))||new Set(data.map(p=>p.id)).size!==data.length)throw Error();if(products.length&&!confirm('Replace this browser’s current catalogue with the imported file?'))return;products=data;reset();const saved=persist();render();if(saved)status('Catalogue imported. Changes are local until exported and redeployed.')}catch{status('Could not import. Check the product fields, unique IDs, categories, prices and image paths.')}finally{e.target.value=''}};
-render();
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Choicez.lk — Product Editor (Retired)</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #fffaf5;
+      color: #302923;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+    .card {
+      max-width: 600px;
+      background: white;
+      border: 1px solid #dacdc1;
+      border-radius: 8px;
+      padding: 35px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    h1 {
+      color: #cb091b;
+      margin-top: 0;
+      font-size: 26px;
+    }
+    p {
+      line-height: 1.6;
+      color: #554e47;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #f1e4dc;
+      color: #8b0d1c;
+      font-size: 12px;
+      font-weight: bold;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .action-btn {
+      display: inline-block;
+      background: #cb091b;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      margin-top: 15px;
+    }
+    .action-btn:hover {
+      background: #a90716;
+    }
+    code {
+      background: #f6f0ea;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">WORKFLOW RETIRED</span>
+    <h1>Local Product Editor has been replaced with Sanity Studio</h1>
+    <p>
+      Product management for Choicez.lk is now powered by <strong>Sanity Studio</strong>.
+      Authorized staff can log in securely from desktop or mobile to add and edit products, upload high-resolution photos, and update availability in real-time.
+    </p>
+    <p>
+      Exporting JSON files and redeploying the website is no longer required. All published changes appear immediately when visitors refresh the catalogue.
+    </p>
+    <p>
+      To run Sanity Studio locally, run <code>npm run studio:dev</code> in the project root and open:
+    </p>
+    <a class="action-btn" href="http://localhost:3333" target="_blank" rel="noopener noreferrer">Open Local Sanity Studio (http://localhost:3333) ↗</a>
+  </div>
+</body>
+</html>

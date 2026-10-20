@@ -1,0 +1,26 @@
+{
+  "name": "choicez-studio",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/icons": "^5.2.3",
+    "@sanity/vision": "^6.20.0",
+    "react": "^19.2.2",
+    "react-dom": "^19.2.2",
+    "sanity": "^6.20.0",
+    "styled-components": "^6.1.15"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.0.10",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,1 +1,13 @@
-{"name":"choicez-lk","private":true,"version":"1.0.0","scripts":{"dev":"node serve.cjs","check":"node --check dist/app.js && node --check serve.cjs"}}
+{
+  "name": "choicez-lk",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "node serve.cjs",
+    "check": "node --check dist/app.js && node --check serve.cjs && npm run --prefix studio type-check",
+    "studio:dev": "npm run --prefix studio dev",
+    "studio:build": "npm run --prefix studio build",
+    "studio:deploy": "npm run --prefix studio deploy",
+    "migrate": "node tools/migrate-to-sanity.cjs"
+  }
+}
