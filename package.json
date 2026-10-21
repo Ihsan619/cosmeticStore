@@ -8,6 +8,7 @@
     "studio:dev": "npm run --prefix studio dev",
     "studio:build": "npm run --prefix studio build",
     "studio:deploy": "npm run --prefix studio deploy",
-    "migrate": "node tools/migrate-to-sanity.cjs"
+    "migrate": "node tools/migrate-to-sanity.cjs",
+    "test": "node --test tests/*.test.cjs"
   }
 }

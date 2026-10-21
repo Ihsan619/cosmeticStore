@@ -17,7 +17,7 @@ function imageUrl(value, width = 800) {
   if (!value) return '';
   try {
     const u = new URL(value, location.href);
-    if (u.hostname.includes('sanity.io')) {
+    if (u.protocol === 'https:' && u.hostname === 'cdn.sanity.io') {
       u.searchParams.set('w', String(width));
       u.searchParams.set('auto', 'format');
       u.searchParams.set('q', '80');
@@ -112,7 +112,7 @@ function render() {
     list.sort((a, b) => {
       const orderA = typeof a.displayOrder === 'number' ? a.displayOrder : 100;
       const orderB = typeof b.displayOrder === 'number' ? b.displayOrder : 100;
-      return orderA - orderB;
+      return Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || orderA - orderB;
     });
   }
 
@@ -152,20 +152,20 @@ function render() {
 }
 
 function openProduct(id) {
-  const p = products.find(p => p.id === id);
+  const p = products.find(p => p.id === id || p.slug === id);
   if (!p) return;
   const image = imageUrl(p.image, 1000);
   const altText = safe(p.imageAlt || p.name);
 
   const additionalThumbs = (p.additionalImages || [])
     .filter(Boolean)
-    .map(img => `<button type="button" class="thumb-btn" style="border:1px solid #dacdc1;padding:2px;background:none;cursor:pointer;border-radius:4px" onclick="document.getElementById('dialog-main-img').src='${safe(imageUrl(img, 1000))}';"><img src="${safe(imageUrl(img, 160))}" alt="" style="width:50px;height:50px;object-fit:cover;display:block;border-radius:2px"></button>`)
+    .map(img => `<button type="button" class="thumb-btn" style="border:1px solid #dacdc1;padding:2px;background:none;cursor:pointer;border-radius:4px" data-photo="${safe(imageUrl(img, 1000))}"><img src="${safe(imageUrl(img, 160))}" alt="" style="width:50px;height:50px;object-fit:cover;display:block;border-radius:2px"></button>`)
     .join('');
 
   $('#dialog-content').innerHTML = `
     <div class="detail-image">
       ${image ? `<img id="dialog-main-img" src="${safe(image)}" alt="${altText}" onerror="this.onerror=null;this.parentElement.innerHTML=art('${safe(p.category)}');">` : art(p.category)}
-      ${additionalThumbs ? `<div class="detail-thumbnails" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">${image ? `<button type="button" class="thumb-btn" style="border:1px solid #dacdc1;padding:2px;background:none;cursor:pointer;border-radius:4px" onclick="document.getElementById('dialog-main-img').src='${safe(image)}';"><img src="${safe(imageUrl(p.image, 160))}" alt="" style="width:50px;height:50px;object-fit:cover;display:block;border-radius:2px"></button>` : ''}${additionalThumbs}</div>` : ''}
+      ${additionalThumbs ? `<div class="detail-thumbnails" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">${image ? `<button type="button" class="thumb-btn" style="border:1px solid #dacdc1;padding:2px;background:none;cursor:pointer;border-radius:4px" data-photo="${safe(image)}"><img src="${safe(imageUrl(p.image, 160))}" alt="" style="width:50px;height:50px;object-fit:cover;display:block;border-radius:2px"></button>` : ''}${additionalThumbs}</div>` : ''}
     </div>
     <div class="detail-copy">
       <p class="eyebrow">${safe(categoryName(p.category))}</p>
@@ -180,6 +180,10 @@ function openProduct(id) {
     </div>
   `;
 
+  document.querySelectorAll('[data-photo]').forEach(button => button.addEventListener('click', () => {
+    const mainImage = $('#dialog-main-img');
+    if (mainImage) mainImage.src = button.dataset.photo;
+  }));
   if (!$('#product-dialog').open) $('#product-dialog').showModal();
   history.replaceState(null, '', `#product=${encodeURIComponent(id)}`);
 }
@@ -241,14 +245,15 @@ async function loadProductsFromSanity() {
   if (!projectId || projectId === 'your_actual_project_id') {
     isLoading = false;
     loadFailed = true;
-    errorMessage = 'Sanity project ID is not configured. Please set window.CHOICEZ_SANITY_CONFIG.projectId in dist/sanity-config.js.';
+    errorMessage = 'Our catalogue is being set up. Please message us for current products and prices.';
     render();
     return;
   }
 
   // GROQ query fetching only published products and only fields the storefront needs
-  const groq = `*[_type == "product" && !(_id in path("drafts.**"))] | order(displayOrder asc, _createdAt desc) {
-    "id": coalesce(slug.current, _id),
+  const groq = `*[_type == "product" && !(_id in path("drafts.**")) && !(_id in path("versions.**"))] | order(displayOrder asc, _createdAt desc) {
+    "id": _id,
+    "slug": slug.current,
     "_id": _id,
     name,
     category,
@@ -265,10 +270,10 @@ async function loadProductsFromSanity() {
   }`;
 
   const host = useCdn ? `${projectId}.apicdn.sanity.io` : `${projectId}.api.sanity.io`;
-  const url = `https://${host}/v${apiVersion}/data/query/${dataset}?query=${encodeURIComponent(groq)}`;
+  const url = `https://${host}/v${apiVersion}/data/query/${dataset}?perspective=published&query=${encodeURIComponent(groq)}`;
 
   try {
-    const res = await fetch(url, {cache: useCdn ? 'default' : 'no-cache'});
+    const res = await fetch(url, {cache: useCdn ? 'default' : 'no-cache', signal: AbortSignal.timeout(15000)});
     if (!res.ok) {
       throw new Error(`Sanity query returned HTTP status ${res.status}`);
     }

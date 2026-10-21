@@ -22,7 +22,7 @@ function getArg(name, fallback) {
   return fallback;
 }
 
-const projectId = getArg('--project', process.env.SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID);
+const projectId = getArg('--project', process.env.SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID || 'b8e94h7q');
 const dataset = getArg('--dataset', process.env.SANITY_DATASET || process.env.SANITY_STUDIO_DATASET || 'production');
 const token = getArg('--token', process.env.SANITY_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN);
 
@@ -227,7 +227,7 @@ async function run() {
       mainPhoto,
     };
 
-    const mutations = [{createOrReplace: doc}];
+    const mutations = [{createIfNotExists: doc}];
     await request('POST', `/v2024-01-01/data/mutate/${dataset}`, {'Content-Type': 'application/json'}, JSON.stringify({mutations}));
     console.log(`[SUCCESS] Imported "${p.name}" with ID: ${docId}\n`);
   }

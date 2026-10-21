@@ -1,5 +1,7 @@
 # Choicez.lk
 
+**Setup status:** Sanity integration is implemented, but the configured `production` dataset was not found and the CLI requires login. Follow [the setup checklist](docs/SANITY-SETUP.md) before using the live catalogue.
+
 A responsive, high-aesthetic product catalogue for Choicez.lk with search, category filtering, price sorting, detail dialogs, direct product links, and WhatsApp enquiries. Powered by a static HTML/CSS/JS storefront and an authenticated **Sanity Studio** for online product and photo management.
 
 No checkout, payment gateway, or customer accounts—this is a browse-and-enquire catalogue.
@@ -129,7 +131,7 @@ Sanity requires you to whitelist websites that are allowed to fetch data from yo
 3. Enter the staff member's email address.
 4. On the **Free Plan**, you can assign:
    - **Administrator**: Full access to project settings, billing, API tokens, and dataset management.
-   - **Editor**: Can create, edit, upload photos, publish, and delete products in Studio. Recommended for catalogue managers.
+   - **Viewer**: Read-only access. Free-plan editing users require Administrator access. Choose a plan with an Editor role if staff should edit products without administering the project.
 
 Staff can log into Studio using Google, GitHub, or email-based magic links directly on their mobile phone or laptop.
 
@@ -148,7 +150,8 @@ A documented pre-migration backup of the legacy product catalogue is saved in:
 npm run migrate -- --dry-run
 
 # Run live migration:
-npm run migrate -- --token <YOUR_SANITY_WRITE_TOKEN> --project <PROJECT_ID>
+# Set SANITY_WRITE_TOKEN in your local terminal environment; never commit it.
+npm run migrate -- --project <PROJECT_ID>
 ```
 The migration script ensures:
 - Existing product IDs and names are checked to prevent duplicate creation.
@@ -195,3 +198,16 @@ For a boutique catalogue of beauty, fragrances, and gift hampers, the Free plan 
   - TikTok: `https://www.tiktok.com/@choicez.lk_`
   - Facebook: `https://www.facebook.com/share/18k9sZaYo7/`
 - **Hosting**: Deployed from `dist/` on Vercel.
+
+## Folder organization
+
+- `dist/`: deployed storefront, styles, scripts and website assets. Keep this folder; Vercel serves it directly.
+- `studio/`: Sanity Studio source and its installed dependencies.
+- `tools/`: catalogue migration utilities.
+- `migration/`: preserved original product data and migration documentation.
+- `create-art.cjs`: source generator for the storefront illustrations.
+- `serve.cjs`, `package.json`, `vercel.json`: development and hosting configuration.
+
+The retired local product editor has been removed. Use Sanity Studio for product management.
+Outside this repository, `../source-media/` contains original branding and product photos, and `../archive/` contains older website exports. These are not deployed or uploaded automatically.
+

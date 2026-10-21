@@ -13,7 +13,7 @@ window.CHOICEZ_SANITY_CONFIG = {
   dataset: 'production',
 
   // Sanity API version (YYYY-MM-DD format)
-  apiVersion: '2024-01-01',
+  apiVersion: '2025-02-19',
 
   // Use Sanity's global CDN (apicdn.sanity.io) for ultra-fast, cached responses.
   // Set to false if you need instantaneous preview of publishes without CDN cache delay.

@@ -81,7 +81,7 @@ export const productType = defineType({
           {title: 'Available to order', value: 'Available to order'},
         ],
       },
-      initialValue: 'In stock',
+      initialValue: 'Ask about availability',
       validation: (Rule) => Rule.required().error('Availability status is required'),
     }),
     defineField({
@@ -137,6 +137,7 @@ export const productType = defineType({
       type: 'number',
       description: 'Order weight in the catalogue. Lower numbers appear first (e.g. 10, 20, 30).',
       initialValue: 100,
+      validation: (Rule) => Rule.integer().min(0),
     }),
   ],
   preview: {
