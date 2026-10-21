@@ -240,7 +240,7 @@ async function loadProductsFromSanity() {
   const projectId = cfg.projectId;
   const dataset = cfg.dataset || 'production';
   const apiVersion = cfg.apiVersion || '2024-01-01';
-  const useCdn = cfg.useCdn !== false;
+  const useCdn = cfg.useCdn === true;
 
   if (!projectId || projectId === 'your_actual_project_id') {
     isLoading = false;
@@ -273,7 +273,7 @@ async function loadProductsFromSanity() {
   const url = `https://${host}/v${apiVersion}/data/query/${dataset}?perspective=published&query=${encodeURIComponent(groq)}`;
 
   try {
-    const res = await fetch(url, {cache: useCdn ? 'default' : 'no-cache', signal: AbortSignal.timeout(15000)});
+    const res = await fetch(url, {cache: useCdn ? 'default' : 'no-store', signal: AbortSignal.timeout(15000)});
     if (!res.ok) {
       throw new Error(`Sanity query returned HTTP status ${res.status}`);
     }

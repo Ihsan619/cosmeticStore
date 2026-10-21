@@ -27,6 +27,8 @@ test('public catalogue requests published perspective and stable IDs, never a wr
   assert.match(query, /versions\.\*\*/);
   assert.equal(request.options.headers, undefined);
   assert.ok(request.options.signal);
+  assert.equal(request.url.hostname, 'testproject.api.sanity.io');
+  assert.equal(request.options.cache, 'no-store');
   assert.equal(context.products[0].id, 'stable-id');
   assert.equal(context.products[0].price, null);
   assert.equal(context.isLoading, false);

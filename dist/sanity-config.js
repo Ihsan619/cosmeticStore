@@ -15,8 +15,7 @@ window.CHOICEZ_SANITY_CONFIG = {
   // Sanity API version (YYYY-MM-DD format)
   apiVersion: '2025-02-19',
 
-  // Use Sanity's global CDN (apicdn.sanity.io) for ultra-fast, cached responses.
-  // Set to false if you need instantaneous preview of publishes without CDN cache delay.
-  useCdn: true,
+  // Read published products directly so page refreshes see current catalogue data.
+  useCdn: false,
 };
 
