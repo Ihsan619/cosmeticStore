@@ -22,7 +22,7 @@ function getArg(name, fallback) {
   return fallback;
 }
 
-const projectId = getArg('--project', process.env.SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID || 'b8e94h7q');
+const projectId = getArg('--project', process.env.SANITY_PROJECT_ID || process.env.SANITY_STUDIO_PROJECT_ID || '3jgxvs45');
 const dataset = getArg('--dataset', process.env.SANITY_DATASET || process.env.SANITY_STUDIO_DATASET || 'production');
 const token = getArg('--token', process.env.SANITY_WRITE_TOKEN || process.env.SANITY_AUTH_TOKEN);
 
@@ -142,7 +142,7 @@ async function run() {
     return;
   }
 
-  if (!projectId || projectId === 'your_project_id_here' || projectId === 'b8e94h7q') {
+  if (!projectId || projectId === 'your_project_id_here' || projectId === '3jgxvs45') {
     console.error('[ERROR] Please specify a valid --project <ID> or set SANITY_PROJECT_ID');
     process.exit(1);
   }
@@ -239,3 +239,4 @@ run().catch((err) => {
   console.error('\n[MIGRATION FAILED]', err.message);
   process.exit(1);
 });
+

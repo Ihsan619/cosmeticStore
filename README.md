@@ -1,6 +1,6 @@
 # Choicez.lk
 
-**Setup status:** Sanity integration is implemented, but the configured `production` dataset was not found and the CLI requires login. Follow [the setup checklist](docs/SANITY-SETUP.md) before using the live catalogue.
+**Setup status:** Connected to Sanity project `3jgxvs45`, public dataset `production`. The saved VATIKA product and photo have been imported. See [the setup checklist](docs/SANITY-SETUP.md).
 
 A responsive, high-aesthetic product catalogue for Choicez.lk with search, category filtering, price sorting, detail dialogs, direct product links, and WhatsApp enquiries. Powered by a static HTML/CSS/JS storefront and an authenticated **Sanity Studio** for online product and photo management.
 

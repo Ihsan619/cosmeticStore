@@ -7,7 +7,7 @@
  */
 window.CHOICEZ_SANITY_CONFIG = {
   // Your Sanity project ID
-  projectId: 'b8e94h7q',
+  projectId: '3jgxvs45',
 
   // Dataset name (default: production)
   dataset: 'production',
@@ -19,3 +19,4 @@ window.CHOICEZ_SANITY_CONFIG = {
   // Set to false if you need instantaneous preview of publishes without CDN cache delay.
   useCdn: true,
 };
+

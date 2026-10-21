@@ -9,6 +9,7 @@
     "studio:build": "npm run --prefix studio build",
     "studio:deploy": "npm run --prefix studio deploy",
     "migrate": "node tools/migrate-to-sanity.cjs",
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/*.test.cjs",
+    "migrate:login": "npm run --prefix studio import:legacy"
   }
 }

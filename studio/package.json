@@ -8,7 +8,8 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "import:legacy": "sanity exec scripts/import-legacy.ts --with-user-token"
   },
   "dependencies": {
     "@sanity/icons": "^5.2.3",

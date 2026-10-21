@@ -1,16 +1,19 @@
-# Finish connecting Sanity
+# Choicez.lk Sanity connection
 
-The storefront and Studio use existing project `b8e94h7q` and dataset `production`. On 21 October 2026, the public API returned “Dataset not found”, and the local CLI required login. No new project was created and no live import has been run.
+Project: `3jgxvs45`, public dataset: `production`.
+Website: https://cosmeticstore123.vercel.app
+Studio hostname: https://choicez-lk.sanity.studio
 
-1. From `studio/`, run `npx sanity login` using the account that owns this project.
-2. Run `npx sanity projects list` and confirm the selected project belongs to you. If it does not, update the project ID in `dist/sanity-config.js`, `studio/sanity.config.ts` and `studio/sanity.cli.ts` before proceeding.
-3. Run `npx sanity dataset list`. If `production` is absent, run `npx sanity dataset create production --visibility public`. Store only public product information in it.
-4. Run `npm run studio:dev` from the repository root. Follow the Studio login/CORS instructions for the exact local origin. Do not add wildcard credentialed origins.
-5. Add a product, upload the main photo, enter alternative text and generate its slug. Publish when ready. The storefront uses the immutable document ID for links, and also accepts existing slug links.
-6. To import the preserved VATIKA record, either add it manually using `migration/vatika-styling-hair-cream.jpg`, or use `npm run migrate`. The importer needs a write token in the terminal environment (`SANITY_WRITE_TOKEN`), never in browser code or Git. `npm run migrate -- --dry-run` makes no network changes. The importer skips matching products and uses create-if-not-exists mutations.
-7. In `studio/`, run `npx sanity deploy` and choose an available Studio hostname. Keep Studio separate from Vercel's `dist/` storefront. The CLI will guide required origin registration.
-8. Add only your actual storefront origin in the project's API CORS settings if browser queries require it. Public storefront queries must not carry write tokens or credentials.
+The inaccessible former project was replaced. The saved VATIKA product and photo were imported on 21 October 2026; its price remains on enquiry.
 
-The existing file editor has been removed. Publishing in Studio updates the public catalogue after a refresh; CDN caching may briefly delay changes. No Git push is required for product content updates. Sanity's Free plan supports Administrator and Viewer roles; Editor is a paid-plan role. Only invite trusted administrators when using Free.
+## Manage products
+Open the hosted Studio and sign in with your Sanity GitHub account. Select All Products, create a product, enter its name/category, generate a slug, upload a main photo and alternative text, choose availability, then publish. Prices are optional. Drafts stay hidden. Unpublish to hide a product without deleting it. Refresh the website to see changes; CDN caching can briefly delay updates. Product edits do not need Git pushes or website redeployments.
 
-Verification still needed after account connection: authenticated uploads and publishing, anonymous read-only access, actual deployed origins, and hosted Studio access from a phone.
+## Local development and import
+Run `npm run dev` for the storefront or `npm run studio:dev` for Studio from the repository root. Validate with `npm run check` and `npm test`.
+Sign in using `npx sanity login` from studio/, then use `npm run migrate:login` from the root to rerun the duplicate-safe legacy import. This uses the CLI session without copying tokens into files. Existing IDs are skipped. Original records remain in migration/.
+
+## Access and backups
+Use exact CORS origins only. Local Studio localhost:3333 needs credentials; the storefront origins do not. Hosted Studio registration adds its origin as needed. Never expose write tokens in browser code. Public datasets and photos must contain public product information only.
+Free-plan editing staff require Administrator access; Viewer is read-only. Editor requires a plan supporting it.
+Run `npx sanity dataset export production backup.tar.gz` from studio/ for backups; keep exports outside deployed dist/ and source separately in GitHub.
